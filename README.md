@@ -29,6 +29,35 @@ streamlit run nama_file.py
 
 Gantilah `nama_file.py` dengan nama file Python yang berisi kode utama.
 
+## Cara Menjalankan Notebook di Google Colab atau Jupyter Notebook
+
+### 1. Jupyter Notebook (Lokal)
+#### a. Pastikan Jupyter Notebook Terinstal
+Jika belum terinstal, jalankan:
+```bash
+pip install jupyter
+```
+
+#### b. Jalankan Jupyter Notebook
+```bash
+jupyter notebook
+```
+Buka file `Proyek_Analisis_Data.ipynb` di browser.
+
+### 2. Google Colab
+#### a. Upload Notebook ke Google Drive
+1. Buka [Google Colab](https://colab.research.google.com/)
+2. Pilih **File > Upload Notebook**
+3. Pilih `Proyek_Analisis_Data.ipynb` dan mulai eksplorasi data
+
+#### b. Upload Dataset ke Google Colab
+Jika dataset tidak tersedia di repository, unggah secara manual atau gunakan kode berikut di Colab:
+```python
+from google.colab import files
+uploaded = files.upload()
+```
+Buka file `Proyek_Analisis_Data.ipynb`.
+
 ## 🔍 Fitur Analisis
 Aplikasi ini memiliki 4 analisis utama:
 
