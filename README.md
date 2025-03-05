@@ -24,10 +24,8 @@ pip install streamlit pandas matplotlib seaborn
 2. Jalankan perintah berikut untuk memulai aplikasi Streamlit:
 
 ```bash
-streamlit run nama_file.py
+streamlit run Dashboard/main.py
 ```
-
-Gantilah `nama_file.py` dengan nama file Python yang berisi kode utama.
 
 ## Cara Menjalankan Notebook di Google Colab atau Jupyter Notebook
 
