@@ -70,6 +70,3 @@ Setiap analisis menampilkan tabel data, visualisasi grafik, serta kesimpulan dar
 
 ## 📊 Dataset
 Dataset yang digunakan adalah `all_data.csv`, yang merupakan gabungan dari dataset harian dan per jam.
-
-## 📞 Kontak
-Jika ada pertanyaan atau saran, silakan hubungi saya melalui GitHub atau email. 😊
