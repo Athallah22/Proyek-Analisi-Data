@@ -1,44 +1,46 @@
 # Proyek-Analisi-Data
-Cara Menjalankan Aplikasi
+# Analisis Efektivitas Sistem Bike-Sharing
 
-Pastikan Anda berada di direktori yang berisi file Bike_Sharing_Analysis.py dan all_data.csv.
+Proyek ini bertujuan untuk menganalisis efektivitas sistem bike-sharing dengan berbagai faktor, seperti hari kerja vs. hari libur, kondisi cuaca, serta pola peminjaman pengguna terdaftar dan kasual.
 
-Jalankan perintah berikut di terminal atau command prompt:
+## 📌 Persyaratan
+Sebelum menjalankan kode, pastikan Anda memiliki lingkungan yang telah dikonfigurasi dengan:
 
-streamlit run Bike_Sharing_Analysis.py
+- **Python 3.x**
+- **pip** (package manager untuk Python)
+- **Streamlit** untuk membuat dashboard interaktif
+- **Pandas** untuk manipulasi data
+- **Matplotlib** dan **Seaborn** untuk visualisasi data
 
-Aplikasi akan berjalan dan dapat diakses melalui browser di http://localhost:8501/.
+## 📥 Instalasi
+Untuk menjalankan kode, install dependensi berikut terlebih dahulu:
 
-Fitur Analisis
+```bash
+pip install streamlit pandas matplotlib seaborn
+```
 
-Setelah aplikasi berjalan, Anda dapat memilih salah satu dari empat analisis utama melalui sidebar:
+## 🚀 Menjalankan Aplikasi
+1. Pastikan file `all_data.csv` sudah tersedia dalam direktori yang sama dengan skrip.
+2. Jalankan perintah berikut untuk memulai aplikasi Streamlit:
 
-Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman
+```bash
+streamlit run nama_file.py
+```
 
-Membandingkan rata-rata peminjaman sepeda pada hari kerja dan hari libur.
+Gantilah `nama_file.py` dengan nama file Python yang berisi kode utama.
 
-Menampilkan pengaruh kondisi cuaca terhadap jumlah peminjaman.
+## 🔍 Fitur Analisis
+Aplikasi ini memiliki 4 analisis utama:
 
-Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja
+1. **Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman**
+2. **Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja**
+3. **Perbedaan Pola Peminjaman Pengguna Registered dan Casual**
+4. **Hari yang Paling Sering Digunakan untuk Meminjam Sepeda**
 
-Melihat perbedaan peminjaman berdasarkan hari kerja dan libur.
+Setiap analisis menampilkan tabel data, visualisasi grafik, serta kesimpulan dari hasil analisis.
 
-Membandingkan pola peminjaman antara pengguna terdaftar (registered) dan kasual (casual).
+## 📊 Dataset
+Dataset yang digunakan adalah `all_data.csv`, yang merupakan gabungan dari dataset harian dan per jam.
 
-Perbedaan pola peminjaman pengguna registered dan casual
-
-Analisis pola peminjaman pengguna registered dan casual sepanjang minggu.
-
-Hari yang paling sering digunakan untuk meminjam sepeda
-
-Menampilkan hari dalam seminggu dengan rata-rata peminjaman sepeda tertinggi.
-
-Catatan Tambahan
-
-Pastikan dataset all_data.csv sudah tersedia di direktori yang sama dengan skrip.
-
-Jika terjadi error terkait Streamlit, coba perbarui Streamlit dengan:
-
-pip install --upgrade streamlit
-
-Untuk menghentikan aplikasi, tekan CTRL + C di terminal.
+## 📞 Kontak
+Jika ada pertanyaan atau saran, silakan hubungi saya melalui GitHub atau email. 😊
