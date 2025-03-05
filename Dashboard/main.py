@@ -6,10 +6,13 @@ import streamlit as st
 sns.set(style='dark')
 
 # Load cleaned data
-all_df = pd.read_csv("Dashboard/all_data.csv")
+all_df = pd.read_csv("all_data.csv")
 
 # Konversi kolom tanggal menjadi datetime
 all_df["date"] = pd.to_datetime(all_df["date"])
+
+day_mapping = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
+all_df['weekday'] = all_df['weekday'].map(day_mapping)
 
 st.title("Analisis Efektivitas Sistem Bike-Sharing")
 
@@ -23,8 +26,15 @@ option = st.sidebar.selectbox("Pilih Analisis:", [
 
 if option == "1. Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman":
     st.header("Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman")
+    
+    # Filter berdasarkan hari dan cuaca
+    selected_days = st.sidebar.multiselect("Pilih Hari:", all_df['weekday'].unique(), default=all_df['weekday'].unique())
+    selected_weather = st.sidebar.multiselect("Pilih Kondisi Cuaca:", all_df['weather_condition'].unique(), default=all_df['weather_condition'].unique())
+    
+    filtered_df = all_df[(all_df['weekday'].isin(selected_days)) & (all_df['weather_condition'].isin(selected_weather))]
+    
     st.subheader("Perbandingan Peminjaman Sepeda: Hari Kerja vs. Libur")
-    table_working_vs_holiday = all_df.groupby(['working_day'])[['total_rentals']].agg(['mean', 'median', 'std'])
+    table_working_vs_holiday = filtered_df.groupby(['working_day'])[['total_rentals']].agg(['mean', 'median', 'std'])
     table_working_vs_holiday.columns = ['Mean Rentals', 'Median Rentals', 'Std Dev']
     table_working_vs_holiday.index = ['Libur', 'Hari Kerja']
     st.dataframe(table_working_vs_holiday)
@@ -37,7 +47,7 @@ if option == "1. Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman":
     st.pyplot(fig)
     
     st.subheader("Perbandingan Peminjaman Sepeda Berdasarkan Cuaca")
-    table_weather_vs_rentals = all_df.groupby(['weather_condition'])[['total_rentals']].agg(['mean', 'median', 'std'])
+    table_weather_vs_rentals = filtered_df.groupby(['weather_condition'])[['total_rentals']].agg(['mean', 'median', 'std'])
     table_weather_vs_rentals.columns = ['Mean Rentals', 'Median Rentals', 'Std Dev']
     st.dataframe(table_weather_vs_rentals)
     
@@ -50,18 +60,30 @@ if option == "1. Pengaruh Hari Kerja/Libur vs. Cuaca terhadap Peminjaman":
     
     st.markdown(
         """
-        1. Rata-rata peminjaman lebih tinggi pada hari kerja dibandingkan hari libur. Namun, cuaca juga berpengaruh signifikan terhadap jumlah peminjaman.
-        2. Saat cuaca cerah, jumlah peminjaman lebih tinggi dibandingkan saat hujan atau mendung.
-        3. Korelasi menunjukkan bahwa cuaca (-0.31) lebih memengaruhi peminjaman dibandingkan hari kerja/libur (0.06).
-        ### Berdasarkan ketiga poin di atas, dapat disimpulkan bahwa cuaca lebih berdampak pada jumlah peminjaman dibandingkan status hari kerja/libur.
+        **Kesimpulan:**
+        - Rata-rata peminjaman lebih tinggi pada hari kerja dibandingkan hari libur.
+        - Saat cuaca cerah, jumlah peminjaman lebih tinggi dibandingkan saat hujan atau mendung.
+        - Korelasi menunjukkan bahwa cuaca (-0.31) lebih memengaruhi peminjaman dibandingkan hari kerja/libur (0.06).
+        - **Cuaca lebih berdampak pada jumlah peminjaman dibandingkan status hari kerja/libur.**
         """
     )
 
 elif option == "2. Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja":
     st.header("Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja")
+    
+    # Filter pilihan Hari Kerja atau Hari Libur
+    work_holiday_option = st.radio("Pilih kategori:", ['Semua', 'Hari Kerja', 'Hari Libur'])
+    
+    if work_holiday_option == 'Hari Kerja':
+        filtered_df = all_df[all_df['working_day'] == 1]
+    elif work_holiday_option == 'Hari Libur':
+        filtered_df = all_df[all_df['working_day'] == 0]
+    else:
+        filtered_df = all_df
+    
     st.subheader("Perbandingan Rata-rata Peminjaman pada Hari Kerja vs. Hari Libur")
-    work_holiday_summary = all_df.groupby('working_day')['total_rentals'].agg(['mean', 'median', 'std'])
-    work_holiday_summary.index = ['Libur', 'Hari Kerja']
+    work_holiday_summary = filtered_df.groupby('working_day')['total_rentals'].agg(['mean', 'median', 'std'])
+    work_holiday_summary = work_holiday_summary.rename(index={0: 'Libur', 1: 'Hari Kerja'})
     st.dataframe(work_holiday_summary)
     
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -72,8 +94,8 @@ elif option == "2. Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja
     st.pyplot(fig)
     
     st.subheader("Perbandingan Peminjaman: Pengguna Terdaftar vs. Kasual")
-    user_type_comparison = all_df.groupby(['working_day'])[['total_registered', 'total_casual']].mean()
-    user_type_comparison.index = ['Libur', 'Hari Kerja']
+    user_type_comparison = filtered_df.groupby(['working_day'])[['total_registered', 'total_casual']].mean()
+    user_type_comparison = user_type_comparison.rename(index={0: 'Libur', 1: 'Hari Kerja'})
     st.dataframe(user_type_comparison)
     
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -96,18 +118,49 @@ elif option == "2. Efektivitas Sistem Bike-Sharing pada Hari Libur vs Hari Kerja
 elif option == "3. Perbedaan pola peminjaman pengguna registered dan casual":
     st.header("Perbedaan pola peminjaman pengguna registered dan casual")
     st.subheader("Pola Peminjaman Pengguna Registered vs. Casual Sepanjang Minggu")
-    weekly_rentals = all_df.groupby('weekday')[['total_registered', 'total_casual']].mean()
+
+    # Mapping angka ke nama hari
     day_mapping = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
+    day_mapping_reverse = {v: k for k, v in day_mapping.items()}  # Untuk mapping balik dari nama hari ke angka
+
+    # Jika weekday dalam format string, ubah ke angka
+    if all_df['weekday'].dtype == 'object':
+        all_df['weekday'] = all_df['weekday'].map(day_mapping_reverse)
+
+    # Pastikan weekday adalah integer setelah mapping
+    all_df['weekday'] = all_df['weekday'].astype(int)
+
+    # Grouping data berdasarkan weekday
+    weekly_rentals = all_df.groupby('weekday')[['total_registered', 'total_casual']].mean()
     weekly_rentals.index = weekly_rentals.index.map(day_mapping)
-    st.dataframe(weekly_rentals)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    weekly_rentals.plot(kind='bar', width=0.8, colormap='coolwarm', edgecolor='black', ax=ax)
-    ax.set_xticklabels(weekly_rentals.index, rotation=0)
-    ax.set_title('Pola Peminjaman Sepeda: Registered vs. Casual per Hari', fontsize=14)
-    st.pyplot(fig)
+    # **✅ Filter Data Per Hari**
+    selected_day = st.selectbox("Pilih Hari:", ["Semua Hari"] + list(day_mapping.values()))
 
-    st.markdown(
+    if selected_day != "Semua Hari":
+        # Filter data berdasarkan hari yang dipilih
+        filtered_data = weekly_rentals.loc[[selected_day]]
+    else:
+        filtered_data = weekly_rentals  # Tampilkan semua data
+
+    # Cek apakah dataframe kosong
+    if filtered_data.empty or filtered_data.isnull().values.all():
+        st.warning("Data tidak tersedia untuk ditampilkan.")
+    else:
+        st.dataframe(filtered_data)
+
+        # Buat plot
+        fig, ax = plt.subplots(figsize=(10, 5))
+        filtered_data.plot(kind='bar', width=0.8, colormap='coolwarm', edgecolor='black', ax=ax)
+        ax.set_xticklabels(filtered_data.index, rotation=0)
+        ax.set_title('Pola Peminjaman Sepeda: Registered vs. Casual per Hari', fontsize=14)
+        ax.set_xlabel('Hari dalam Seminggu', fontsize=12)
+        ax.set_ylabel('Rata-rata Peminjaman', fontsize=12)
+        ax.legend(['Registered', 'Casual'], loc='upper left')
+
+        st.pyplot(fig)
+
+        st.markdown(
         """
         1. Pengguna Registered (Terdaftar)
             - Peminjaman sepeda meningkat dari Senin hingga Jumat, dengan puncak pada Kamis dan Jumat (sekitar 4000-an).
@@ -122,21 +175,49 @@ elif option == "3. Perbedaan pola peminjaman pengguna registered dan casual":
         ### Registered Users lebih aktif pada hari kerja, kemungkinan besar untuk transportasi sehari-hari, dan Casual Users lebih aktif di akhir pekan, kemungkinan besar untuk rekreasi atau perjalanan santai.
         """
     )
+
 elif option == "4. Hari yang paling sering digunakan untuk meminjam sepeda":
     st.header("Hari yang paling sering digunakan untuk meminjam sepeda")
     st.subheader("Rata-rata Total Peminjaman Sepeda per Hari dalam Seminggu")
-    weekly_total_rentals = all_df.groupby('weekday')['total_rentals'].mean()
-    day_mapping = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
-    weekly_total_rentals.index = weekly_total_rentals.index.map(day_mapping)
-    st.dataframe(weekly_total_rentals)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    sns.barplot(x=weekly_total_rentals.index, y=weekly_total_rentals.values, palette='coolwarm', edgecolor='black')
-    ax.set_title('Rata-rata Peminjaman Sepeda per Hari dalam Seminggu', fontsize=14)
-    ax.set_xlabel('Hari dalam Seminggu', fontsize=12)
-    ax.set_ylabel('Rata-rata Peminjaman', fontsize=12)
-    ax.set_xticklabels(weekly_total_rentals.index, rotation=0)
-    st.pyplot(fig)
+    # Mapping angka ke nama hari
+    day_mapping = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
+    day_mapping_reverse = {v: k for k, v in day_mapping.items()}  # Mapping balik nama hari ke angka
+
+    # Jika weekday dalam format string, ubah ke angka
+    if all_df['weekday'].dtype == 'object':
+        all_df['weekday'] = all_df['weekday'].map(day_mapping_reverse)
+
+    # Pastikan weekday adalah integer setelah mapping
+    all_df['weekday'] = all_df['weekday'].astype(int)
+
+    # **Hitung rata-rata peminjaman sepeda per hari**
+    weekly_total_rentals = all_df.groupby('weekday')['total_rentals'].mean()
+    weekly_total_rentals.index = weekly_total_rentals.index.map(day_mapping)
+
+    # **✅ Filter Data Per Hari**
+    selected_day = st.selectbox("Pilih Hari:", ["Semua Hari"] + list(day_mapping.values()))
+
+    if selected_day != "Semua Hari":
+        # Filter data berdasarkan hari yang dipilih
+        filtered_data = weekly_total_rentals.loc[[selected_day]]
+    else:
+        filtered_data = weekly_total_rentals  # Tampilkan semua data
+
+    # **Tampilkan Data**
+    st.dataframe(filtered_data)
+
+    # **Buat Plot**
+    if not filtered_data.empty:
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.barplot(x=filtered_data.index, y=filtered_data.values, palette='coolwarm', edgecolor='black')
+        ax.set_title('Rata-rata Peminjaman Sepeda per Hari dalam Seminggu', fontsize=14)
+        ax.set_xlabel('Hari dalam Seminggu', fontsize=12)
+        ax.set_ylabel('Rata-rata Peminjaman', fontsize=12)
+        ax.set_xticklabels(filtered_data.index, rotation=0)
+        st.pyplot(fig)
+    else:
+        st.warning("Data tidak tersedia untuk ditampilkan.")
 
     st.markdown(
         """
