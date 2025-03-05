@@ -6,7 +6,7 @@ import streamlit as st
 sns.set(style='dark')
 
 # Load cleaned data
-all_df = pd.read_csv("all_data.csv")
+all_df = pd.read_csv("Dashboard/all_data.csv")
 
 # Konversi kolom tanggal menjadi datetime
 all_df["date"] = pd.to_datetime(all_df["date"])
